@@ -811,6 +811,9 @@ function App(){
     fetchNews();
     const fetchIv=setInterval(fetchNews,45000);
     return()=>{clearInterval(fetchIv)};
+  },[fetchNews]);
+
+  const lb=useMemo
 
   const lb=useMemo(()=>Object.entries(stats).map(([k,s])=>({k,n:N[k],s,total:Object.entries(s).filter(([kk])=>SM[kk]).reduce((a,[,v])=>a+v,0),xp:s.xp||0})).sort((a,b)=>b.total-a.total),[stats]);
   const pHf=useMemo(()=>pH.filter(p=>p>0),[pH]); // Filter out zero entries
