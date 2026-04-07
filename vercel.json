@@ -1,11 +1,1 @@
-{
-  "buildCommand": "echo skip",
-  "installCommand": "echo skip",
-  "outputDirectory": ".",
-  "functions": {
-    "api/news.js": {
-      "runtime": "@vercel/node@3.0.0",
-      "maxDuration": 30
-    }
-  }
-}
+{}
