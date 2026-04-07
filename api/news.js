@@ -2,7 +2,7 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: 'No ANTHROPIC_API_KEY' });
+  if (!apiKey) return res.status(500).json({ error: 'No API key' });
 
   const query = req.query.q;
   if (!query) return res.status(400).json({ error: 'No q param' });
@@ -22,7 +22,7 @@ export default async function handler(req, res) {
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1500,
         tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-        messages: [{ role: 'user', content: 'Search: "' + query + '" Find 2-4 CURRENT military events from last 24h. Today: ' + today + '. Only events from ' + today + ' or ' + yday + '. Map to: USA,ISRAEL,IRAN,FRANCE,RUSSIA,CHINA,NKOREA. Return ONLY JSON: [{"a":"CODE","t":"CODE","h":"headline max 90 chars","tp":"military|nuclear|cyber|intel","sv":1-10,"d":"' + today + '","url":"https://source.com/article"}]' }]
+        messages: [{ role: 'user', content: 'Search: "' + query + '" Find 2-4 CURRENT military events from last 24h. Today: ' + today + '. Only from ' + today + ' or ' + yday + '. Codes: USA,ISRAEL,IRAN,FRANCE,RUSSIA,CHINA,NKOREA. ONLY JSON: [{"a":"CODE","t":"CODE","h":"headline 90 chars","tp":"military|nuclear|cyber|intel","sv":1-10,"d":"' + today + '","url":"https://source.com/article"}]' }]
       })
     });
     if (!r.ok) return res.status(r.status).json({ error: await r.text() });
