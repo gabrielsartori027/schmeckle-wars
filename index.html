@@ -775,43 +775,9 @@ function App(){
   const fetchNews=useCallback(async()=>{
     setFetching(true);
     const q=QUERIES[fetchRound.current%QUERIES.length];fetchRound.current++;
-    const today=new Date().toISOString().split("T")[0];
-    const yesterday=new Date(Date.now()-86400000).toISOString().split("T")[0];
     try{
-      const r=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1500,tools:[{type:"web_search_20250305",name:"web_search"}],
-          messages:[{role:"user",content:`You are a military intelligence analyst. Search the web RIGHT NOW for: "${q}"
-
-⚠️ CRITICAL DATE REQUIREMENT: Today is ${today}. ONLY return events dated ${today} or ${yesterday}. 
-ANY event before ${yesterday} must be COMPLETELY IGNORED — zero tolerance for old news.
-
-Find 2-4 CURRENT military events happening RIGHT NOW or in the last 24 hours ONLY.
-
-✅ ACCEPT:
-- Airstrikes, drone attacks, bombings with specific location — HAPPENING TODAY
-- Ground combat, territorial changes reported TODAY
-- Missile launches or interceptions from LAST 24 HOURS
-- Military casualties confirmed TODAY
-- Active naval confrontations happening NOW
-- Nuclear developments announced TODAY
-- Weapons arriving at frontline TODAY
-
-❌ REJECT ABSOLUTELY:
-- ANYTHING before ${yesterday} — even if it's important
-- Political statements, speeches, diplomatic talks
-- "Tensions" or "concerns" without a specific military event TODAY
-- Historical context, background summaries
-- Future plans, speculation, analysis
-
-Each headline: WHO + WHAT military action + WHERE + must be from today/yesterday
-
-Codes: USA (Ukraine-related too), ISRAEL, IRAN (Hamas/Hezbollah/Houthis), FRANCE (NATO), RUSSIA, CHINA, NKOREA
-
-ONLY valid JSON:
-[{"a":"ATTACKER","t":"TARGET","h":"specific current military action max 90 chars","tp":"military|nuclear|cyber|intel","sv":1-10,"d":"${today}","url":"https://source.com/article"}]
-
-url = real article URL. Prefer reuters.com, apnews.com, bbc.com.
-JSON ONLY. Zero old news.`}]})});
+      const r=await fetch("/api/news",{method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({query:q})});
       if(!r.ok)throw new Error(`${r.status}`);
       const data=await r.json();const txt=data.content?.filter(b=>b.type==="text").map(b=>b.text).join("")||"";
       const m=txt.match(/\[[\s\S]*?\]/);if(m){
