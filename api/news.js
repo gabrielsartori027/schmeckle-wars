@@ -1,26 +1,11 @@
-export const config = { api: { bodyParser: true } };
-
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'No ANTHROPIC_API_KEY' });
 
-  let query = '';
-  try {
-    let b = req.body;
-    if (!b) {
-      let raw = '';
-      for await (const chunk of req) raw += chunk;
-      b = JSON.parse(raw);
-    }
-    if (typeof b === 'string') b = JSON.parse(b);
-    query = b.query || '';
-  } catch(e) {}
-
-  if (!query) return res.status(400).json({ error: 'No query found', bodyType: typeof req.body, body: req.body });
+  const query = req.query.q;
+  if (!query) return res.status(400).json({ error: 'No q param' });
 
   const today = new Date().toISOString().split('T')[0];
   const yday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
