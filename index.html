@@ -812,6 +812,7 @@ function App(){
     const fetchIv=setInterval(fetchNews,45000);
     return()=>{clearInterval(fetchIv)};
   },[fetchNews]);
+  },[fetchNews]);
 
   const lb=useMemo
 
