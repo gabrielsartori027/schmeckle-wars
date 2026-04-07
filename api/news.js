@@ -12,7 +12,7 @@ export default async function handler(req, res) {
 
   const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
-  for (let attempt = 0; attempt < 3; attempt++) {
+  for (let attempt = 0; attempt < 4; attempt++) {
     try {
       const r = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
@@ -22,15 +22,16 @@ export default async function handler(req, res) {
           'anthropic-version': '2023-06-01'
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1500,
+          model: 'claude-haiku-4-5-20251001',
+          max_tokens: 1024,
           tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-          messages: [{ role: 'user', content: 'Search: "' + query + '" Find 2-4 CURRENT military events from last 24h. Today: ' + today + '. Only from ' + today + ' or ' + yday + '. Codes: USA,ISRAEL,IRAN,FRANCE,RUSSIA,CHINA,NKOREA. ONLY JSON: [{"a":"CODE","t":"CODE","h":"headline 90 chars","tp":"military|nuclear|cyber|intel","sv":1-10,"d":"' + today + '","url":"https://source.com/article"}]' }]
+          messages: [{ role: 'user', content: 'Search: "' + query + '" Find 2-3 CURRENT military events from last 24h. Today: ' + today + '. Only from ' + today + ' or ' + yday + '. Codes: USA,ISRAEL,IRAN,FRANCE,RUSSIA,CHINA,NKOREA. ONLY JSON: [{"a":"CODE","t":"CODE","h":"headline 90 chars","tp":"military|nuclear|cyber|intel","sv":1-10,"d":"' + today + '","url":"https://source.com/article"}]' }]
         })
       });
 
       if (r.status === 429 || r.status === 529) {
-        const waitMs = (attempt + 1) * 8000;
+        const retryAfter = r.headers.get('retry-after');
+        const waitMs = retryAfter ? parseInt(retryAfter) * 1000 : (attempt + 1) * 15000;
         await sleep(waitMs);
         continue;
       }
@@ -39,8 +40,8 @@ export default async function handler(req, res) {
       return res.status(200).json(await r.json());
 
     } catch (e) {
-      if (attempt === 2) return res.status(500).json({ error: e.message });
-      await sleep((attempt + 1) * 5000);
+      if (attempt === 3) return res.status(500).json({ error: e.message });
+      await sleep((attempt + 1) * 8000);
     }
   }
 
