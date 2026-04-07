@@ -773,6 +773,7 @@ function App(){
 
   // ── NEWS FETCH — WAR EVENTS ONLY ──
   const fetchNews=useCallback(async()=>{
+    if(fetching)return;
     setFetching(true);
     const q=QUERIES[fetchRound.current%QUERIES.length];fetchRound.current++;
     try{
@@ -808,12 +809,8 @@ function App(){
   useEffect(()=>{
     // Fetch immediately on load, then again at 8s for a second theater
     fetchNews();
-    const secondFetch=setTimeout(fetchNews,8000);
-    // Auto-fetch rotating theaters every 25s
-    const fetchIv=setInterval(fetchNews,25000);
-    return()=>{clearTimeout(secondFetch);clearInterval(fetchIv)};
-  },[fetchNews]);
-  // Price chart path from DexScreener history (no simulation needed when CA is set)
+    const fetchIv=setInterval(fetchNews,45000);
+    return()=>{clearInterval(fetchIv)};
 
   const lb=useMemo(()=>Object.entries(stats).map(([k,s])=>({k,n:N[k],s,total:Object.entries(s).filter(([kk])=>SM[kk]).reduce((a,[,v])=>a+v,0),xp:s.xp||0})).sort((a,b)=>b.total-a.total),[stats]);
   const pHf=useMemo(()=>pH.filter(p=>p>0),[pH]); // Filter out zero entries
