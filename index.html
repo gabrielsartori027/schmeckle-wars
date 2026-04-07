@@ -772,7 +772,7 @@ function App(){
   useEffect(()=>()=>{if(atkTimer.current)clearTimeout(atkTimer.current)},[]);
 
   // ── NEWS FETCH — WAR EVENTS ONLY ──
-  const fetchNews=useCallback(async()=>{
+  const fetchNews=useCallback(async()=>{if(fetching)return;
     setFetching(true);
     const q=QUERIES[fetchRound.current%QUERIES.length];fetchRound.current++;
     try{
